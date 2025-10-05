@@ -72,7 +72,7 @@ services:
       - REDIS_PORT=6379
       - REDIS_PASSWORD=${REDIS_PASSWORD}
       - CACHE_DRIVER=redis
-      - SESSION_DRIVER=redis
+      - SESSION_DRIVER=file
       - QUEUE_CONNECTION=redis
       - LOG_CHANNEL=stack
     volumes:

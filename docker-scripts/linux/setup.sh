@@ -333,6 +333,14 @@ compose() {
     "${COMPOSE_CMD[@]}" "${COMPOSE_GLOBAL_ARGS[@]}" "$@"
 }
 
+service_exists() {
+    local service=$1
+    if compose config --services | grep -Fxq "$service"; then
+        return 0
+    fi
+    return 1
+}
+
 build_containers() {
     log_info "Building Docker images"
     local services=()
@@ -414,10 +422,21 @@ maybe_install_dependencies() {
     answer=${answer,,}
     if [[ $answer == y* ]]; then
         log_info "Installing Node dependencies and building assets"
-        if compose run --rm app sh -lc 'npm ci && npm run build'; then
-            log_info "npm ci/npm run build completed"
+        if compose run --rm app sh -lc 'command -v npm >/dev/null'; then
+            if compose run --rm app sh -lc 'npm ci && npm run build'; then
+                log_info "npm ci/npm run build completed"
+            else
+                log_warn "npm ci/npm run build failed; rerun manually if needed"
+            fi
+        elif service_exists node; then
+            log_info "npm is unavailable in the app container; using the node service instead"
+            if compose run --rm node sh -lc 'npm ci && npm run build'; then
+                log_info "npm ci/npm run build completed via node service"
+            else
+                log_warn "npm ci/npm run build via node service failed; rerun manually if needed"
+            fi
         else
-            log_warn "npm ci/npm run build failed; rerun manually if needed"
+            log_warn "npm is not available in the app container and no node service is defined; skipping"
         fi
     else
         log_info "Skipping npm dependency install"
@@ -456,7 +475,7 @@ wait_for_postgres() {
 }
 
 run_in_app() {
-    compose exec -T app bash -lc "$1"
+    compose exec -T app sh -lc "$1"
 }
 
 run_artisan() {
@@ -503,7 +522,7 @@ print_summary() {
     echo "  ${COMPOSE_CMD[*]} up -d                # Start services"
     echo "  ${COMPOSE_CMD[*]} down                  # Stop services"
     echo "  ${COMPOSE_CMD[*]} logs -f app           # Tail application logs"
-    echo "  ${COMPOSE_CMD[*]} exec app bash         # Shell into the app container"
+    echo "  ${COMPOSE_CMD[*]} exec app sh           # Shell into the app container"
 }
 
 main() {
