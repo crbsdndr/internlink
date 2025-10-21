@@ -117,14 +117,14 @@ class SchoolController extends Controller
         return view('school.show', compact('school'));
     }
 
-    public function edit(int $id)
+    public function edit($id)
     {
         $school = School::findOrFail($id);
 
         return view('school.edit', compact('school'));
     }
 
-    public function update(Request $request, int $id)
+    public function update(Request $request, $id)
     {
         $school = School::findOrFail($id);
         $data = $this->validateSchool($request, $school->id);
@@ -135,7 +135,7 @@ class SchoolController extends Controller
         return redirect('/schools/' . $school->id . '/read')->with('status', 'School updated successfully.');
     }
 
-    public function destroy(int $id)
+    public function destroy($id)
     {
         $school = School::findOrFail($id);
         $school->delete();

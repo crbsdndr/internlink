@@ -58,7 +58,7 @@ class MajorStaffAssignmentController extends Controller
         return redirect($this->schoolRoute('major-contacts'))->with('status', 'Staff contact assigned successfully.');
     }
 
-    public function edit(int $id)
+    public function edit($school, $id)
     {
         $this->authorizeManage();
 
@@ -70,7 +70,7 @@ class MajorStaffAssignmentController extends Controller
         return view('major-staff.edit', $this->formData($schoolId, $assignment));
     }
 
-    public function update(Request $request, int $id)
+    public function update(Request $request, $school, $id)
     {
         $this->authorizeManage();
 
@@ -90,7 +90,7 @@ class MajorStaffAssignmentController extends Controller
         return redirect($this->schoolRoute('major-contacts'))->with('status', 'Staff contact updated successfully.');
     }
 
-    public function destroy(int $id)
+    public function destroy($school, $id)
     {
         $this->authorizeManage();
 

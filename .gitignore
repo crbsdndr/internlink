@@ -21,9 +21,10 @@
 /storage/*.key
 /storage/pail
 /vendor
-/agents
+/venv
+/__pycache__
+requirements.txt
 Homestead.json
 Homestead.yaml
 Thumbs.db
 setup_script.sh
-AGENTS.md
